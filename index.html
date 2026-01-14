@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHM 201 Test Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ash-main: #4a5568;
+            --ash-dark: #2d3748;
+            --ash-bg: #f8f9fa;
+            --border: #e2e8f0;
+            --white: #ffffff;
+            --success: #38a169;
+            --danger: #e53e3e;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--ash-bg); 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+        }
+
+        /* Top Navigation Tabs */
+        .tabs { position: fixed; top: 10px; display: flex; gap: 5px; z-index: 100; }
+        .tab-btn { 
+            background: var(--white); border: 1px solid var(--border); padding: 8px 16px; 
+            border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--ash-main);
+        }
+        .tab-btn.active { background: var(--ash-main); color: white; border-color: var(--ash-main); }
+
+        /* Card Container (Matching Image Style) */
+        .container {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; width: 100%;
+        }
+
+        .login-card {
+            background: var(--white);
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid #f1f1f1;
+        }
+
+        .badge {
+            background: #ff5f5f;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        h1 { font-size: 24px; margin: 10px 0; color: #1a202c; }
+        .instructor-text { color: #718096; font-size: 15px; margin-bottom: 30px; }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+            background: #fff;
+        }
+
+        .main-btn {
+            background: var(--ash-main);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: 0.3s;
+        }
+        .main-btn:hover { background: var(--ash-dark); }
+
+        /* Quiz Layout */
+        #quiz-container { display: none; width: 100%; max-width: 700px; padding: 20px; margin-top: 60px; }
+        .header-bar { 
+            background: var(--white); padding: 15px 20px; border-radius: 10px; 
+            border: 1px solid var(--border); display: flex; justify-content: space-between; 
+            align-items: center; position: sticky; top: 10px; z-index: 50;
+        }
+
+        .question-card { background: var(--white); padding: 25px; border-radius: 10px; margin-top: 15px; border: 1px solid var(--border); }
+        
+        /* Options with Radio on Left */
+        .option-item {
+            display: flex; align-items: flex-start; padding: 12px; border: 1px solid #edf2f7;
+            border-radius: 8px; margin-top: 10px; cursor: pointer; transition: 0.2s;
+        }
+        .option-item input { width: auto; margin: 3px 12px 0 0; cursor: pointer; }
+        .option-item:hover { background: #f7fafc; border-color: var(--ash-main); }
+
+        /* Correction view */
+        .correct { border-left: 5px solid var(--success); }
+        .wrong { border-left: 5px solid var(--danger); }
+        .feedback { background: #f0fff4; color: var(--success); padding: 10px; border-radius: 5px; margin-top: 10px; font-weight: 600; font-size: 13px; border: 1px solid #c6f6d5; }
+
+        /* Admin Dashboard */
+        #admin-page { display: none; width: 95%; max-width: 1000px; margin: 80px auto; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+        th { background: var(--ash-main); color: white; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+
+        #results-screen { display: none; text-align: center; margin-top: 80px; width: 90%; max-width: 600px; }
+    </style>
+</head>
+<body>
+
+<div class="tabs" id="nav-tabs">
+    <button class="tab-btn active" id="studentTab" onclick="switchTab('student')">Student Portal</button>
+    <button class="tab-btn" id="adminTab" onclick="switchTab('admin')">Admin Login</button>
+</div>
+
+<div id="landing-page" class="container">
+    <div class="login-card">
+        <h1>CHM 201 Test Portal</h1>
+        <p class="instructor-text">Instructor: <b>Daniel Leonard (Chemistry)</b></p>
+        <div class="badge">Duration: 7 Minutes</div>
+        
+        <input type="text" id="userName" placeholder="Full Student Name">
+        <input type="text" id="userDept" placeholder="Department">
+        <input type="password" id="userCode" placeholder="Access Code">
+        
+        <button class="main-btn" onclick="startTest()">Gain Access</button>
+    </div>
+</div>
+
+<div id="quiz-container">
+    <div class="header-bar">
+        <div><b id="activeUser">User</b><br><small id="activeDept">Dept</small></div>
+        <div id="timer" style="font-size: 20px; font-weight: 800; color: var(--ash-main);">07:00</div>
+    </div>
+    <div id="questions-list"></div>
+    <button class="main-btn" style="margin: 30px 0;" onclick="submitFinal()">Submit Examination</button>
+</div>
+
+<div id="results-screen">
+    <div class="login-card" style="max-width: 100%;">
+        <h2>Score: <span id="userScore">0/0</span></h2>
+        <p id="resultDetails"></p>
+        <button class="main-btn" onclick="location.reload()" style="width: 150px;">Exit Portal</button>
+    </div>
+    <div id="review-list" style="text-align: left;"></div>
+</div>
+
+<div id="admin-page">
+    <div class="login-card" style="max-width: 100%; text-align: left;">
+        <h2 style="margin-bottom: 5px;">Respondents Log</h2>
+        <p style="color: #718096; margin-bottom: 20px;">Admin Access Level: Instructor</p>
+        <table>
+            <thead><tr><th>Student Name</th><th>Department</th><th>Score</th><th>Submitted At</th></tr></thead>
+            <tbody id="admin-table-body"></tbody>
+        </table>
+        <div style="margin-top: 25px; display: flex; gap: 10px;">
+            <button class="main-btn" style="background: #718096; width: auto; padding: 12px 25px;" onclick="window.print()">Export PDF</button>
+            <button class="main-btn" style="background: var(--danger); width: auto; padding: 12px 25px;" onclick="clearLogs()">Reset Data</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Note: I have included a few sample questions. 
+    // You can paste your full list of 70 questions here.
+    const examQuestions = [
+        { q: "Which boron compound is used as a mild antiseptic?", options: ["Borax", "Boric acid", "Boron oxide", "Brown boron"], correct: 1 },
+        { q: "Graphite is a good electrical conductor because of:", options: ["Rigid 3-D framework", "Delocalized π-electrons", "sp³ hybridization", "High density"], correct: 1 },
+        { q: "The most abundant metal in the Earth’s crust is:", options: ["Iron", "Silicon", "Aluminium", "Calcium"], correct: 2 },
+        { q: "What is the dominant oxidation state of most Group 14 elements?", options: ["+2", "+3", "+4", "+6"], correct: 2 },
+        { q: "Which halide of Group 14 is ionic?", options: ["SnCl₄", "PbCl₄", "SnF₄", "CCl₄"], correct: 2 },
+        { q: "Boron shows a diagonal relationship with:", options: ["Aluminium", "Carbon", "Silicon", "Beryllium"], correct: 2 }
+    ];
+
+    let timer;
+    let secondsLeft = 420; // 7 Minutes
+
+    function switchTab(view) {
+        if(view === 'admin') {
+            const pass = prompt("Enter Admin Code:");
+            if(pass !== "1278") return alert("Unauthorized access.");
+        }
+        document.getElementById('landing-page').style.display = view === 'student' ? 'flex' : 'none';
+        document.getElementById('admin-page').style.display = view === 'admin' ? 'block' : 'none';
+        document.getElementById('studentTab').classList.toggle('active', view === 'student');
+        document.getElementById('adminTab').classList.toggle('active', view === 'admin');
+        if(view === 'admin') updateAdminTable();
+    }
+
+    function startTest() {
+        const name = document.getElementById('userName').value;
+        const dept = document.getElementById('userDept').value;
+        const code = document.getElementById('userCode').value;
+
+        if(!name || !dept) return alert("Please provide your Name and Department.");
+        if(code !== "2020") return alert("Invalid Access Code.");
+
+        document.getElementById('activeUser').innerText = name;
+        document.getElementById('activeDept').innerText = dept;
+        document.getElementById('landing-page').style.display = 'none';
+        document.getElementById('nav-tabs').style.display = 'none';
+        document.getElementById('quiz-container').style.display = 'block';
+
+        loadQuestions();
+        startTimer();
+    }
+
+    function loadQuestions() {
+        const list = document.getElementById('questions-list');
+        list.innerHTML = examQuestions.map((item, i) => `
+            <div class="question-card" id="qc-${i}">
+                <p><b>Q${i+1}.</b> ${item.q}</p>
+                ${item.options.map((opt, j) => `
+                    <label class="option-item">
+                        <input type="radio" name="q${i}" value="${j}"> 
+                        <span style="margin-top: -2px;"><b>${String.fromCharCode(65+j)}.</b> ${opt}</span>
+                    </label>
+                `).join('')}
+            </div>
+        `).join('');
+    }
+
+    function startTimer() {
+        timer = setInterval(() => {
+            let m = Math.floor(secondsLeft / 60);
+            let s = secondsLeft % 60;
+            document.getElementById('timer').innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            if(secondsLeft-- <= 0) {
+                clearInterval(timer);
+                alert("Time is up! Submitting your script automatically.");
+                submitFinal();
+            }
+        }, 1000);
+    }
+
+    function submitFinal() {
+        if(secondsLeft > 0) {
+            if(!confirm("Are you sure you want to submit your script?")) return;
+        }
+        
+        clearInterval(timer);
+        let score = 0;
+        const review = document.getElementById('review-list');
+        review.innerHTML = "<h3 style='margin: 30px 0 10px 0;'>Correction & Review:</h3>";
+
+        examQuestions.forEach((item, i) => {
+            const selected = document.querySelector(`input[name="q${i}"]:checked`);
+            const ans = selected ? parseInt(selected.value) : -1;
+            const card = document.getElementById(`qc-${i}`).cloneNode(true);
+            
+            // Cleanup: remove radio buttons from review view
+            card.querySelectorAll('input').forEach(input => input.remove());
+
+            if(ans === item.correct) {
+                score++;
+                card.classList.add('correct');
+            } else {
+                card.classList.add('wrong');
+                const feedback = document.createElement('div');
+                feedback.className = 'feedback';
+                feedback.innerText = `Correct Answer: ${String.fromCharCode(65+item.correct)}. ${item.options[item.correct]}`;
+                card.appendChild(feedback);
+            }
+            review.appendChild(card);
+        });
+
+        // Save to Logs
+        const results = JSON.parse(localStorage.getItem('chm_exam_logs') || '[]');
+        results.push({
+            name: document.getElementById('userName').value,
+            dept: document.getElementById('userDept').value,
+            score: `${score}/${examQuestions.length}`,
+            time: new Date().toLocaleString()
+        });
+        localStorage.setItem('chm_exam_logs', JSON.stringify(results));
+
+        document.getElementById('quiz-container').style.display = 'none';
+        document.getElementById('results-screen').style.display = 'block';
+        document.getElementById('userScore').innerText = `${score} / ${examQuestions.length}`;
+        document.getElementById('resName').innerText = document.getElementById('userName').value;
+        window.scrollTo(0,0);
+    }
+
+    function updateAdminTable() {
+        const logs = JSON.parse(localStorage.getItem('chm_exam_logs') || '[]');
+        document.getElementById('admin-table-body').innerHTML = logs.map(l => `
+            <tr>
+                <td>${l.name}</td>
+                <td>${l.dept}</td>
+                <td style="font-weight:700; color:var(--ash-main);">${l.score}</td>
+                <td>${l.time}</td>
+            </tr>
+        `).join('');
+    }
+
+    function clearLogs() { 
+        if(confirm("Permanently clear all student records?")) { 
+            localStorage.removeItem('chm_exam_logs'); 
+            updateAdminTable(); 
+        } 
+    }
+</script>
+
+</body>
+</html>
