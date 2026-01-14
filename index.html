@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHM 201 Portal | Instructor Daniel Leonard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --premium-blue: #1a365d;
+            --accent-blue: #2b6cb0;
+            --ash-light: #f4f4f5;
+            --ash-border: #e2e8f0;
+            --white: #ffffff;
+            --success: #2f855a;
+            --danger: #c53030;
+            --warning: #e53e3e;
+        }
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--ash-light); color: #2d3748; margin: 0; }
+
+        /* Navigation Tabs */
+        .tab-container { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); display: flex; z-index: 3000; border: 1px solid var(--ash-border); border-radius: 8px; overflow: hidden; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .tab-btn { border: none; padding: 10px 25px; cursor: pointer; font-weight: 600; color: var(--premium-blue); background: white; transition: 0.3s; }
+        .tab-btn.active { background: var(--premium-blue); color: white; }
+
+        /* Landing Page */
+        #landing-page { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            height: 100vh; width: 100%; position: fixed; top: 0; left: 0; z-index: 2000;
+            background: linear-gradient(rgba(26, 54, 93, 0.85), rgba(26, 54, 93, 0.85)), 
+                        url('https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover; background-position: center;
+        }
+
+        .card { background: var(--white); padding: 40px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: 1px solid var(--ash-border); width: 360px; text-align: center; }
+        
+        .instructor-frame {
+            width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--premium-blue);
+            margin: 0 auto 15px auto; overflow: hidden; background: #eee; display: flex; align-items: center; justify-content: center;
+        }
+        .instructor-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--ash-border); border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        .btn { background: var(--premium-blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 15px; transition: 0.2s; }
+        .btn:hover { background: var(--accent-blue); transform: translateY(-1px); }
+
+        /* Quiz UI */
+        #quiz-container { display: none; max-width: 800px; margin: 0 auto; padding-bottom: 60px; }
+        .nav-bar { position: sticky; top: 0; background: var(--premium-blue); color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .timer-box { background: rgba(255,255,255,0.2); padding: 8px 20px; border-radius: 8px; font-weight: 700; font-size: 1.3rem; }
+        .timer-warning { background: var(--warning) !important; animation: pulse 1s infinite; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50
