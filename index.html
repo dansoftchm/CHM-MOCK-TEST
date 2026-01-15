@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aceminds | CHM 201 Examination Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --ash-main: #4a5568; --ash-bg: #f8f9fa; --border: #e2e8f0; --white: #ffffff; 
+            --emerald: #10b981; --emerald-hover: #059669; --success: #38a169; --danger: #e53e3e; --blue: #3182ce;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--ash-bg); margin: 0; display: flex; flex-direction: column; align-items: center; user-select: none; }
+        .tabs { position: fixed; top: 10px; display: flex; gap: 5px; z-index: 1000; }
+        .tab-btn { background: var(--white); border: 1px solid var(--border); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 11px; font-weight: 600; color: var(--ash-main); }
+        .tab-btn.active { background: var(--ash-main); color: white; border-color: var(--ash-main); }
+        
+        .container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; width: 100%; }
+        .login-card { background: var(--white); padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); width: 90%; max-width: 420px; text-align: center; }
+        
+        input, textarea, select { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline-color: var(--emerald); }
+        .emerald-btn { background: var(--emerald); color: white; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: 700; cursor: pointer; text-transform: uppercase; }
+
+        #quiz-container, #admin-page { display: none; width: 95%; max-width: 900px; padding: 20px; margin-top: 60px; }
+        .admin-section { background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; }
+        th { background: #f7fafc; }
+        
+        .question-card { background: white; padding: 20px; border-radius: 10px; margin-top: 15px; border: 1px solid var(--border); }
+        .option-item { display: flex; align-items: center; padding: 10px; border: 1px solid #edf2f7; border-radius: 8px; margin-bottom: 5px; cursor: pointer; }
+        .correct-fill { background-color: #c6f6d5 !important; border-color: #38a169 !important; }
+        .wrong-fill { background-color: #fed7d7 !important; border-color: #e53e3e !important; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+<div class="tabs">
+    <button class="tab-btn active" id="studentTab" onclick="ui('student')">Portal</button>
+    <button class="tab-btn" id="adminTab" onclick="ui('admin')">Admin Panel</button>
+</div>
+
+<div id="landing-page" class="container">
+    <div class="login-card">
+        <p style="font-size:10px; color:#a0aec0; text-transform:uppercase">Welcome to Aceminds tutorial!</p>
+        <h1>CHM 201 Test</h1>
+        <p style="color: #718096; font-size: 13px;">Instructor: <b>Daniel Leonard</b></p>
+        <input type="text" id="userName" placeholder="Student Full Name">
+        <input type="text" id="userDept" placeholder="Department">
+        <input type="password" id="userCode" placeholder="Access Code (2020)">
+        <button class="emerald-btn" onclick="startTest()">Start Examination</button>
+    </div>
+</div>
+
+<div id="quiz-container">
+    <div id="result-display" style="display:none; text-align:center; background:#f0fff4; padding:20px; border-radius:10px; border:1px solid #c6f6d5; margin-bottom:20px;">
+        <h2 style="font-size:12px; color:#22543d">FINAL GRADE</h2>
+        <div id="final-percent" style="font-size:60px; font-weight:900; color:#10b981">0%</div>
+    </div>
+    <div id="questions-list"></div>
+    <button id="submitBtn" class="emerald-btn" style="margin-top:20px" onclick="submitTest()">Submit All</button>
+    <button id="exitBtn" class="emerald-btn" style="display:none; margin-top:20px; background:#4a5568" onclick="location.reload()">Close Portal</button>
+</div>
+
+<div id="admin-page">
+    <div class="admin-section">
+        <h2 style="margin-top:0">Class Results</h2>
+        <div style="overflow-x:auto">
+            <table>
+                <thead><tr><th>Student</th><th>Dept</th><th>Score</th><th>Time</th></tr></thead>
+                <tbody id="logs-body"></tbody>
+            </table>
+        </div>
+        <button onclick="clearData()" style="color:red; background:none; border:none; cursor:pointer; font-size:11px; margin-top:10px">Wipe All Results</button>
+    </div>
+
+    <div class="admin-section">
+        <h2>English Question Editor</h2>
+        <select id="edit-select" onchange="loadToEdit()"></select>
+        <textarea id="edit-q" rows="2" placeholder="Question text"></textarea>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+            <input type="text" id="opt0" placeholder="Option A">
+            <input type="text" id="opt1" placeholder="Option B">
+            <input type="text" id="opt2" placeholder="Option C">
+            <input type="text" id="opt3" placeholder="Option D">
+        </div>
+        <label>Correct Answer (0=A, 1=B, 2=C, 3=D):</label>
+        <input type="number" id="edit-cor" min="0" max="3">
+        <button class="emerald-btn" style="background:var(--blue)" onclick="saveEdit()">Save Changes</button>
+        <button class="emerald-btn" style="background:#4a5568; margin-top:5px; font-size:12px" onclick="addNew()">+ Add New Question</button>
+    </div>
+</div>
+
+<script>
+    const defaultQs = [
+        { q: "Which boron compound is used as a mild antiseptic?", options: ["Borax", "Boric acid", "Boron oxide", "Brown boron"], correct: 1 },
+        { q: "The most abundant metal in the Earth’s crust is:", options: ["Iron", "Silicon", "Aluminium", "Calcium"], correct: 2 }
+    ];
+
+    let questions = JSON.parse(localStorage.getItem('chm_questions')) || defaultQs;
+    let results = JSON.parse(localStorage.getItem('chm_results')) || [];
+
+    function ui(view) {
+        if(view === 'admin') {
+            const p = prompt("Admin Key:");
+            if(p !== "1278") return;
+            document.getElementById('landing-page').style.display = 'none';
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('admin-page').style.display = 'block';
+            refreshAdmin();
+        } else {
+            location.reload();
+        }
+    }
+
+    function startTest() {
+        const n = document.getElementById('userName').value;
+        const c = document.getElementById('userCode').value;
+        if(!n || c !== "2020") return alert("Check Name/Code");
+        
+        document.getElementById('landing-page').style.display = 'none';
+        document.getElementById('quiz-container').style.display = 'block';
+        const list = document.getElementById('questions-list');
+        list.innerHTML = questions.map((q, i) => `
+            <div class="question-card">
+                <p><b>${i+1}.</b> ${q.q}</p>
+                ${q.options.map((opt, j) => `
+                    <label class="option-item" id="L-${i}-${j}">
+                        <input type="radio" name="q${i}" value="${j}"> ${opt}
+                    </label>
+                `).join('')}
+            </div>
+        `).join('');
+    }
+
+    function submitTest() {
+        if(!confirm("Submit?")) return;
+        let score = 0;
+        questions.forEach((q, i) => {
+            const sel = document.querySelector(`input[name="q${i}"]:checked`);
+            if(sel && parseInt(sel.value) === q.correct) score++;
+            if(sel) {
+                const isCorrect = parseInt(sel.value) === q.correct;
+                document.getElementById(`L-${i}-${sel.value}`).classList.add(isCorrect ? 'correct-fill' : 'wrong-fill');
+            }
+            document.getElementById(`L-${i}-${q.correct}`).classList.add('correct-fill');
+        });
+
+        const pct = ((score / questions.length) * 100).toFixed(1);
+        document.getElementById('final-percent').innerText = pct + "%";
+        document.getElementById('result-display').style.display = 'block';
+        document.getElementById('submitBtn').style.display = 'none';
+        document.getElementById('exitBtn').style.display = 'block';
+
+        results.push({
+            name: document.getElementById('userName').value,
+            dept: document.getElementById('userDept').value,
+            score: pct + "%",
+            time: new Date().toLocaleTimeString()
+        });
+        localStorage.setItem('chm_results', JSON.stringify(results));
+    }
+
+    function refreshAdmin() {
+        const sel = document.getElementById('edit-select');
+        sel.innerHTML = questions.map((q, i) => `<option value="${i}">Q${i+1}: ${q.q.substring(0,25)}...</option>`).join('');
+        loadToEdit();
+
+        const tbody = document.getElementById('logs-body');
+        tbody.innerHTML = results.map(r => `<tr><td>${r.name}</td><td>${r.dept}</td><td><b>${r.score}</b></td><td>${r.time}</td></tr>`).reverse().join('');
+    }
+
+    function loadToEdit() {
+        const i = document.getElementById('edit-select').value;
+        if(!questions[i]) return;
+        document.getElementById('edit-q').value = questions[i].q;
+        document.getElementById('opt0').value = questions[i].options[0];
+        document.getElementById('opt1').value = questions[i].options[1];
+        document.getElementById('opt2').value = questions[i].options[2];
+        document.getElementById('opt3').value = questions[i].options[3];
+        document.getElementById('edit-cor').value = questions[i].correct;
+    }
+
+    function saveEdit() {
+        const i = document.getElementById('edit-select').value;
+        questions[i] = {
+            q: document.getElementById('edit-q').value,
+            options: [document.getElementById('opt0').value, document.getElementById('opt1').value, document.getElementById('opt2').value, document.getElementById('opt3').value],
+            correct: parseInt(document.getElementById('edit-cor').value)
+        };
+        localStorage.setItem('chm_questions', JSON.stringify(questions));
+        alert("Saved!");
+        refreshAdmin();
+    }
+
+    function addNew() {
+        questions.push({ q: "New Question?", options: ["A", "B", "C", "D"], correct: 0 });
+        localStorage.setItem('chm_questions', JSON.stringify(questions));
+        refreshAdmin();
+        document.getElementById('edit-select').value = questions.length - 1;
+        loadToEdit();
+    }
+
+    function clearData() {
+        if(confirm("Wipe results?")) { results = []; localStorage.setItem('chm_results', '[]'); refreshAdmin(); }
+    }
+</script>
+</body>
+</html>
